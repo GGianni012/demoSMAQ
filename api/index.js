@@ -70,24 +70,41 @@ app.post('/api/wallet/create-pass', async (req, res) => {
             payload: {
                 genericObjects: [
                     {
-                        // ID objeto: emisor.identificador_unico (Google agrega el prefijo automáticamente)
+                        // ID objeto: emisor.identificador_unico
                         id: `${issuerId}.AQ57_${Date.now()}`,
-                        // classId: SOLO el nombre de la clase, sin prefijo de Issuer ID
-                        // Google Wallet API agrega el prefijo automáticamente en modo JWT
+                        // classId completo con prefijo
                         classId: `${issuerId}.Smaqs_Member`,
+                        // Estado requerido
+                        state: 'ACTIVE',
+                        // Tipo genérico
                         genericType: 'GENERIC_TYPE_UNSPECIFIED',
+                        // Imagen hero (requerida para algunos tipos)
+                        heroImage: {
+                            sourceUri: {
+                                uri: 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg'
+                            },
+                            contentDescription: {
+                                defaultValue: { language: 'es', value: 'Aquilea 57' }
+                            }
+                        },
+                        // Título de la tarjeta
                         cardTitle: { defaultValue: { language: 'es', value: 'AQUILEA 57' } },
+                        // Header y subheader
                         header: { defaultValue: { language: 'es', value: 'SMAQS' } },
                         subheader: { defaultValue: { language: 'es', value: 'Saldo' } },
+                        // Logo
                         logo: {
-                            sourceUri: { uri: 'https://storage.googleapis.com/wallet-ux-samples/logos/wallet-logo.png' },
-                            contentDescription: { defaultValue: { language: 'es', value: 'Logo' } }
+                            sourceUri: { uri: 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg' },
+                            contentDescription: { defaultValue: { language: 'es', value: 'Logo Aquilea 57' } }
                         },
+                        // Color de fondo
                         hexBackgroundColor: '#0a0a0a',
+                        // Módulos de texto
                         textModulesData: [
                             { header: 'NIVEL', body: mockUser.tier, id: 'tier' },
                             { header: 'SALDO', body: `${mockUser.balance} Ɖ`, id: 'balance' }
                         ],
+                        // Código de barras
                         barcode: {
                             type: 'QR_CODE',
                             value: `AQ57_${mockUser.id}_${crypto.randomUUID()}`

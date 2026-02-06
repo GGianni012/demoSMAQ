@@ -81,7 +81,7 @@ app.post('/api/wallet/create-pass', async (req, res) => {
                         // Imagen hero (requerida para algunos tipos)
                         heroImage: {
                             sourceUri: {
-                                uri: 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg'
+                                uri: 'https://farm4.staticflickr.com/3723/11177041115_6e6a3b6f49_o.jpg'
                             },
                             contentDescription: {
                                 defaultValue: { language: 'es', value: 'Aquilea 57' }
@@ -94,7 +94,7 @@ app.post('/api/wallet/create-pass', async (req, res) => {
                         subheader: { defaultValue: { language: 'es', value: 'Saldo' } },
                         // Logo
                         logo: {
-                            sourceUri: { uri: 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg' },
+                            sourceUri: { uri: 'https://farm4.staticflickr.com/3723/11177041115_6e6a3b6f49_o.jpg' },
                             contentDescription: { defaultValue: { language: 'es', value: 'Logo Aquilea 57' } }
                         },
                         // Color de fondo

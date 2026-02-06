@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 const app = express();
+// Versión 1.2 - Forzando redespacho técnico
 app.use(express.json());
 
 // Mock Database

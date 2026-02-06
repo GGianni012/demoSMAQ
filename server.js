@@ -25,25 +25,36 @@ const mockUser = {
 
 // Endpoint to generate Google Wallet Pass
 app.post('/api/wallet/create-pass', async (req, res) => {
-    console.log('Generando link REAL de Google Wallet...');
+    console.log('Iniciando generación de pase...');
 
     try {
         let keyData;
-        if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
-            try {
-                keyData = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
-            } catch (err) {
-                console.error('Error parseando GOOGLE_SERVICE_ACCOUNT_JSON:', err.message);
-                return res.json({ success: false, message: 'JSON de credenciales inválido en Vercel.' });
-            }
-        } else {
-            try {
-                keyData = require('./key.json');
-            } catch (err) {
-                return res.json({ success: false, message: 'Faltan credenciales (key.json o variable de entorno).' });
-            }
-        }
+        const envKey = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
         const issuerId = process.env.GOOGLE_ISSUER_ID;
+
+        // Validación de variables de entorno con mensajes claros
+        if (!envKey) {
+            return res.status(400).json({
+                success: false,
+                message: 'Falta la variable GOOGLE_SERVICE_ACCOUNT_JSON en Vercel.'
+            });
+        }
+        if (!issuerId || issuerId === 'REEMPLAZAR_CON_TU_ISSUER_ID') {
+            return res.status(400).json({
+                success: false,
+                message: 'Falta la variable GOOGLE_ISSUER_ID en Vercel.'
+            });
+        }
+
+        try {
+            keyData = JSON.parse(envKey);
+        } catch (err) {
+            return res.status(400).json({
+                success: false,
+                message: 'El JSON de GOOGLE_SERVICE_ACCOUNT_JSON tiene un error de formato.',
+                error: err.message
+            });
+        }
 
         if (!issuerId || issuerId === 'REEMPLAZAR_CON_TU_ISSUER_ID') {
             return res.json({

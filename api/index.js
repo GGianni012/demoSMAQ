@@ -47,10 +47,10 @@ app.post('/api/wallet/create-pass', async (req, res) => {
             aud: 'google',
             typ: 'savetowallet',
             iat: Math.floor(Date.now() / 1000),
+            origins: ['demo-smaq.vercel.app', 'localhost:3001'],
             payload: {
                 genericObjects: [
                     {
-                        // ID: emisor.identificador_unico
                         id: `${issuerId}.AQ57_${Date.now()}`,
                         classId: `${issuerId}.Smaqs_Member`,
                         genericType: 'GENERIC_TYPE_UNSPECIFIED',
@@ -58,7 +58,6 @@ app.post('/api/wallet/create-pass', async (req, res) => {
                         header: { defaultValue: { language: 'es', value: 'SMAQS' } },
                         subheader: { defaultValue: { language: 'es', value: 'Saldo' } },
                         logo: {
-                            // Usamos un logo externo temporal para descartar problemas de carga del servidor
                             sourceUri: { uri: 'https://storage.googleapis.com/wallet-ux-samples/logos/wallet-logo.png' },
                             contentDescription: { defaultValue: { language: 'es', value: 'Logo' } }
                         },
@@ -79,7 +78,7 @@ app.post('/api/wallet/create-pass', async (req, res) => {
         const token = jwt.sign(payload, keyData.private_key, { algorithm: 'RS256' });
         const saveUrl = `https://pay.google.com/gp/v/save/${token}`;
 
-        return res.json({ success: true, saveUrl });
+        return res.json({ success: true, saveUrl, debugToken: token, debugPayload: payload });
     } catch (error) {
         console.error('CRITICAL API ERROR:', error.message);
         return res.status(500).json({ success: false, error: 'Internal Server Error', detail: error.message });

@@ -51,7 +51,9 @@ app.post('/api/wallet/create-pass', async (req, res) => {
             payload: {
                 genericObjects: [
                     {
+                        // ID: emisor.identificador_unico
                         id: `${issuerId}.AQ57_${Date.now()}`,
+                        // Google internamente le pone el prefijo del Issuer ID aunque en la consola solo veas el nombre corto
                         classId: `${issuerId}.Smaqs_Member`,
                         genericType: 'GENERIC_TYPE_UNSPECIFIED',
                         cardTitle: { defaultValue: { language: 'es', value: 'AQUILEA 57' } },

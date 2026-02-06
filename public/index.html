@@ -77,21 +77,15 @@
                 if (data.saveUrl) {
                     window.location.href = data.saveUrl;
                 } else {
-                    status.textContent = 'Demo: En una versión real, aquí se abriría el link de Google Wallet. (Credenciales requeridas)';
+                    status.textContent = 'Demo: ' + (data.message || 'Error en la respuesta');
                     btn.disabled = false;
-                    btn.innerHTML = `
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Wallet_Icon_2022.svg" alt="Google Wallet" class="wallet-icon">
-                        Add to Google Wallet
-                    `;
+                    btn.innerHTML = `<img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Wallet_Icon_2022.svg" alt="Google Wallet" class="wallet-icon"> Add to Google Wallet`;
                 }
             } catch (error) {
-                console.error('Error:', error);
-                status.textContent = 'Error al conectar con el servidor de la demo.';
+                console.error('Fetch error:', error);
+                status.textContent = 'Error interno: ' + error.message;
                 btn.disabled = false;
-                btn.innerHTML = `
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Wallet_Icon_2022.svg" alt="Google Wallet" class="wallet-icon">
-                        Add to Google Wallet
-                    `;
+                btn.innerHTML = `<img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Wallet_Icon_2022.svg" alt="Google Wallet" class="wallet-icon"> Add to Google Wallet`;
             }
         });
     </script>

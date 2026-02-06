@@ -47,7 +47,7 @@ app.post('/api/wallet/create-pass', async (req, res) => {
             aud: 'google',
             typ: 'savetowallet',
             iat: Math.floor(Date.now() / 1000),
-            origins: ['demo-smaq.vercel.app', 'localhost:3001'],
+            origins: ['https://demo-smaq.vercel.app', 'http://localhost:3001'],
             payload: {
                 genericObjects: [
                     {

@@ -9,7 +9,11 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Mock Database
 const mockUser = {
@@ -25,15 +29,19 @@ app.post('/api/wallet/create-pass', async (req, res) => {
 
     try {
         let keyData;
-        try {
-            keyData = process.env.GOOGLE_SERVICE_ACCOUNT_JSON
-                ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON)
-                : require('./key.json');
-        } catch (e) {
-            return res.json({
-                success: false,
-                message: 'Error de configuración: Faltan credenciales.'
-            });
+        if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+            try {
+                keyData = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+            } catch (err) {
+                console.error('Error parseando GOOGLE_SERVICE_ACCOUNT_JSON:', err.message);
+                return res.json({ success: false, message: 'JSON de credenciales inválido en Vercel.' });
+            }
+        } else {
+            try {
+                keyData = require('./key.json');
+            } catch (err) {
+                return res.json({ success: false, message: 'Faltan credenciales (key.json o variable de entorno).' });
+            }
         }
         const issuerId = process.env.GOOGLE_ISSUER_ID;
 
@@ -59,7 +67,7 @@ app.post('/api/wallet/create-pass', async (req, res) => {
                         header: { defaultValue: { language: 'es', value: 'SMAQS' } },
                         subheader: { defaultValue: { language: 'es', value: 'Saldo' } },
                         logo: {
-                            sourceUri: { uri: 'https://amorina.club/logo-demo-wallet.jpg' },
+                            sourceUri: { uri: `https://${req.get('host')}/logo.jpg` },
                             contentDescription: { defaultValue: { language: 'es', value: 'Aquilea 57 Logo' } }
                         },
                         hexBackgroundColor: '#0a0a0a',

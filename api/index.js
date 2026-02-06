@@ -1,8 +1,6 @@
-require('dotenv').config();
 const express = require('express');
-const path = require('path');
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 const app = express();
 app.use(express.json());
@@ -15,31 +13,32 @@ const mockUser = {
     tier: 'Protector'
 };
 
-// Health check and root redirect
-app.get('/api', (req, res) => {
-    res.json({ status: 'API is running', version: '1.1' });
+// Health Check
+app.get('/api/health', (req, res) => {
+    res.json({ ok: true, timestamp: new Date().toISOString() });
 });
 
 // Endpoint to generate Google Wallet Pass
 app.post('/api/wallet/create-pass', async (req, res) => {
-    console.log('Iniciando generación de pase...');
+    console.log('API: Iniciando generación de pase...');
 
     try {
         const envKey = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
         const issuerId = process.env.GOOGLE_ISSUER_ID;
 
+        // Validaciones súper básicas
         if (!envKey) {
-            return res.status(400).json({ success: false, message: 'Falta GOOGLE_SERVICE_ACCOUNT_JSON' });
+            return res.status(400).json({ success: false, message: 'Configuración incompleta: falta credencial.' });
         }
         if (!issuerId || issuerId.includes('REEMPLAZAR')) {
-            return res.status(400).json({ success: false, message: 'Falta GOOGLE_ISSUER_ID' });
+            return res.status(400).json({ success: false, message: 'Configuración incompleta: falta Issuer ID.' });
         }
 
         let keyData;
         try {
             keyData = JSON.parse(envKey);
         } catch (err) {
-            return res.status(400).json({ success: false, message: 'JSON de credenciales inválido' });
+            return res.status(400).json({ success: false, message: 'Error en formato de credencial.' });
         }
 
         const payload = {
@@ -57,7 +56,7 @@ app.post('/api/wallet/create-pass', async (req, res) => {
                         header: { defaultValue: { language: 'es', value: 'SMAQS' } },
                         subheader: { defaultValue: { language: 'es', value: 'Saldo' } },
                         logo: {
-                            sourceUri: { uri: `https://demo-smaq.vercel.app/logo.jpg` },
+                            sourceUri: { uri: `https://${req.get('host')}/logo.jpg` },
                             contentDescription: { defaultValue: { language: 'es', value: 'Aquilea 57 Logo' } }
                         },
                         hexBackgroundColor: '#0a0a0a',
@@ -67,7 +66,7 @@ app.post('/api/wallet/create-pass', async (req, res) => {
                         ],
                         barcode: {
                             type: 'QR_CODE',
-                            value: `AQ57_${mockUser.id}_${uuidv4()}`
+                            value: `AQ57_${mockUser.id}_${crypto.randomUUID()}`
                         }
                     }
                 ]
@@ -77,10 +76,10 @@ app.post('/api/wallet/create-pass', async (req, res) => {
         const token = jwt.sign(payload, keyData.private_key, { algorithm: 'RS256' });
         const saveUrl = `https://pay.google.com/gp/v/save/${token}`;
 
-        res.json({ success: true, saveUrl });
+        return res.json({ success: true, saveUrl });
     } catch (error) {
-        console.error('SERVER ERROR:', error);
-        res.status(500).json({ success: false, error: error.message });
+        console.error('CRITICAL API ERROR:', error.message);
+        return res.status(500).json({ success: false, error: 'Internal Server Error', detail: error.message });
     }
 });
 

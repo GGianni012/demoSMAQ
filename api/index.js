@@ -50,16 +50,17 @@ app.post('/api/wallet/create-pass', async (req, res) => {
             payload: {
                 genericObjects: [
                     {
-                        // ID DE OBJETO ÚNICO PARA CADA CLICK (Evita errores de caché en Google)
-                        id: `${issuerId}.obj_${Date.now()}`,
+                        // ID: emisor.identificador_unico
+                        id: `${issuerId}.AQ57_${Date.now()}`,
                         classId: `${issuerId}.Smaqs_Member`,
                         genericType: 'GENERIC_TYPE_UNSPECIFIED',
                         cardTitle: { defaultValue: { language: 'es', value: 'AQUILEA 57' } },
                         header: { defaultValue: { language: 'es', value: 'SMAQS' } },
                         subheader: { defaultValue: { language: 'es', value: 'Saldo' } },
                         logo: {
-                            sourceUri: { uri: `https://${req.get('host')}/logo.jpg` },
-                            contentDescription: { defaultValue: { language: 'es', value: 'Aquilea 57 Logo' } }
+                            // Usamos un logo externo temporal para descartar problemas de carga del servidor
+                            sourceUri: { uri: 'https://storage.googleapis.com/wallet-ux-samples/logos/wallet-logo.png' },
+                            contentDescription: { defaultValue: { language: 'es', value: 'Logo' } }
                         },
                         hexBackgroundColor: '#0a0a0a',
                         textModulesData: [

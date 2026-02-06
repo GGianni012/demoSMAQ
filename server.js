@@ -24,7 +24,17 @@ app.post('/api/wallet/create-pass', async (req, res) => {
     console.log('Generando link REAL de Google Wallet...');
 
     try {
-        const keyData = require('./key.json');
+        let keyData;
+        try {
+            keyData = process.env.GOOGLE_SERVICE_ACCOUNT_JSON
+                ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON)
+                : require('./key.json');
+        } catch (e) {
+            return res.json({
+                success: false,
+                message: 'Error de configuración: Faltan credenciales.'
+            });
+        }
         const issuerId = process.env.GOOGLE_ISSUER_ID;
 
         if (!issuerId || issuerId === 'REEMPLAZAR_CON_TU_ISSUER_ID') {

@@ -36,17 +36,27 @@ app.post('/api/wallet/create-pass', async (req, res) => {
             });
         }
 
-        // Cargar credenciales desde key.json
+        // Cargar credenciales (desde env var en producción, o key.json en desarrollo)
         let keyData;
         try {
-            const keyPath = path.join(__dirname, '..', 'key.json');
-            const keyFile = fs.readFileSync(keyPath, 'utf8');
-            keyData = JSON.parse(keyFile);
+            const envKey = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+
+            if (envKey) {
+                // Producción (Vercel): leer desde variable de entorno
+                console.log('Usando credenciales desde env var');
+                keyData = JSON.parse(envKey);
+            } else {
+                // Desarrollo local: leer desde archivo key.json
+                console.log('Usando credenciales desde key.json');
+                const keyPath = path.join(__dirname, '..', 'key.json');
+                const keyFile = fs.readFileSync(keyPath, 'utf8');
+                keyData = JSON.parse(keyFile);
+            }
         } catch (err) {
-            console.error('Error cargando key.json:', err.message);
+            console.error('Error cargando credenciales:', err.message);
             return res.status(400).json({
                 success: false,
-                message: 'Error cargando credenciales. Verifica que key.json existe.',
+                message: 'Error cargando credenciales. Verifica configuración.',
                 detail: err.message
             });
         }

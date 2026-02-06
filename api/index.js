@@ -1,19 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const { google } = require('googleapis');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
 
 // Mock Database
 const mockUser = {
@@ -23,44 +15,31 @@ const mockUser = {
     tier: 'Protector'
 };
 
+// Health check and root redirect
+app.get('/api', (req, res) => {
+    res.json({ status: 'API is running', version: '1.1' });
+});
+
 // Endpoint to generate Google Wallet Pass
 app.post('/api/wallet/create-pass', async (req, res) => {
     console.log('Iniciando generación de pase...');
 
     try {
-        let keyData;
         const envKey = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
         const issuerId = process.env.GOOGLE_ISSUER_ID;
 
-        // Validación de variables de entorno con mensajes claros
         if (!envKey) {
-            return res.status(400).json({
-                success: false,
-                message: 'Falta la variable GOOGLE_SERVICE_ACCOUNT_JSON en Vercel.'
-            });
+            return res.status(400).json({ success: false, message: 'Falta GOOGLE_SERVICE_ACCOUNT_JSON' });
         }
-        if (!issuerId || issuerId === 'REEMPLAZAR_CON_TU_ISSUER_ID') {
-            return res.status(400).json({
-                success: false,
-                message: 'Falta la variable GOOGLE_ISSUER_ID en Vercel.'
-            });
+        if (!issuerId || issuerId.includes('REEMPLAZAR')) {
+            return res.status(400).json({ success: false, message: 'Falta GOOGLE_ISSUER_ID' });
         }
 
+        let keyData;
         try {
             keyData = JSON.parse(envKey);
         } catch (err) {
-            return res.status(400).json({
-                success: false,
-                message: 'El JSON de GOOGLE_SERVICE_ACCOUNT_JSON tiene un error de formato.',
-                error: err.message
-            });
-        }
-
-        if (!issuerId || issuerId === 'REEMPLAZAR_CON_TU_ISSUER_ID') {
-            return res.json({
-                success: false,
-                message: 'Falta el Issuer ID. Por favor pegalo en el chat.'
-            });
+            return res.status(400).json({ success: false, message: 'JSON de credenciales inválido' });
         }
 
         const payload = {
@@ -78,21 +57,13 @@ app.post('/api/wallet/create-pass', async (req, res) => {
                         header: { defaultValue: { language: 'es', value: 'SMAQS' } },
                         subheader: { defaultValue: { language: 'es', value: 'Saldo' } },
                         logo: {
-                            sourceUri: { uri: `https://${req.get('host')}/logo.jpg` },
+                            sourceUri: { uri: `https://demo-smaq.vercel.app/logo.jpg` },
                             contentDescription: { defaultValue: { language: 'es', value: 'Aquilea 57 Logo' } }
                         },
                         hexBackgroundColor: '#0a0a0a',
                         textModulesData: [
-                            {
-                                header: 'NIVEL',
-                                body: mockUser.tier,
-                                id: 'tier'
-                            },
-                            {
-                                header: 'SALDO',
-                                body: `${mockUser.balance} Ɖ`,
-                                id: 'balance'
-                            }
+                            { header: 'NIVEL', body: mockUser.tier, id: 'tier' },
+                            { header: 'SALDO', body: `${mockUser.balance} Ɖ`, id: 'balance' }
                         ],
                         barcode: {
                             type: 'QR_CODE',
@@ -106,20 +77,11 @@ app.post('/api/wallet/create-pass', async (req, res) => {
         const token = jwt.sign(payload, keyData.private_key, { algorithm: 'RS256' });
         const saveUrl = `https://pay.google.com/gp/v/save/${token}`;
 
-        console.log('JWT generado exitosamente.');
         res.json({ success: true, saveUrl });
     } catch (error) {
-        console.error('Error generando JWT real:', error);
+        console.error('SERVER ERROR:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
-// Para desarrollo local
-if (require.main === module) {
-    app.listen(PORT, () => {
-        console.log(`Demo Smaqs Wallet corriendo en http://localhost:${PORT}`);
-    });
-}
-
-// Para Vercel
 module.exports = app;

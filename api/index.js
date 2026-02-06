@@ -1,9 +1,11 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
-// Versión 1.2 - Forzando redespacho técnico
+// Versión 1.3 - Configuración correcta con Issuer ID numérico
 app.use(express.json());
 
 // Mock Database
@@ -24,22 +26,29 @@ app.post('/api/wallet/create-pass', async (req, res) => {
     console.log('API: Iniciando generación de pase...');
 
     try {
-        const envKey = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
         const issuerId = process.env.GOOGLE_ISSUER_ID ? process.env.GOOGLE_ISSUER_ID.trim() : null;
 
-        // Validaciones súper básicas
-        if (!envKey) {
-            return res.status(400).json({ success: false, message: 'Configuración incompleta: falta credencial.' });
-        }
+        // Validar Issuer ID
         if (!issuerId || issuerId.includes('REEMPLAZAR')) {
-            return res.status(400).json({ success: false, message: 'Configuración incompleta: falta Issuer ID.' });
+            return res.status(400).json({
+                success: false,
+                message: 'Configuración incompleta: falta Issuer ID válido en .env'
+            });
         }
 
+        // Cargar credenciales desde key.json
         let keyData;
         try {
-            keyData = JSON.parse(envKey);
+            const keyPath = path.join(__dirname, '..', 'key.json');
+            const keyFile = fs.readFileSync(keyPath, 'utf8');
+            keyData = JSON.parse(keyFile);
         } catch (err) {
-            return res.status(400).json({ success: false, message: 'Error en formato de credencial.' });
+            console.error('Error cargando key.json:', err.message);
+            return res.status(400).json({
+                success: false,
+                message: 'Error cargando credenciales. Verifica que key.json existe.',
+                detail: err.message
+            });
         }
 
         const payload = {
@@ -51,9 +60,10 @@ app.post('/api/wallet/create-pass', async (req, res) => {
             payload: {
                 genericObjects: [
                     {
-                        // ID: emisor.identificador_unico
+                        // ID objeto: emisor.identificador_unico (Google agrega el prefijo automáticamente)
                         id: `${issuerId}.AQ57_${Date.now()}`,
-                        // Google internamente le pone el prefijo del Issuer ID aunque en la consola solo veas el nombre corto
+                        // classId: SOLO el nombre de la clase, sin prefijo de Issuer ID
+                        // Google Wallet API agrega el prefijo automáticamente en modo JWT
                         classId: `${issuerId}.Smaqs_Member`,
                         genericType: 'GENERIC_TYPE_UNSPECIFIED',
                         cardTitle: { defaultValue: { language: 'es', value: 'AQUILEA 57' } },

@@ -1,0 +1,214 @@
+:root {
+    --bg-color: #0a0a0a;
+    --card-bg: #1a1a1a;
+    --gold: #c9a227;
+    --gold-dim: #8b6914;
+    --text: #faf5f0;
+    --text-dim: rgba(250, 245, 240, 0.6);
+    --border: rgba(201, 162, 39, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 450px;
+    width: 100%;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.logo {
+    width: 100px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+}
+
+h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--text-dim);
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.card-header h2 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 30px;
+}
+
+.balance-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    background: rgba(201, 162, 39, 0.05);
+    border-radius: 12px;
+    border: 1px dashed var(--border);
+}
+
+.balance-label {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+}
+
+.balance-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+}
+
+.balance-name {
+    font-size: 1rem;
+    letter-spacing: 4px;
+    color: var(--gold-dim);
+    margin-top: 5px;
+}
+
+.actions {
+    text-align: center;
+}
+
+.info-text {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.google-wallet-btn {
+    background-color: #000;
+    color: #fff;
+    border: 1px solid #5f6368;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+    justify-content: center;
+}
+
+.google-wallet-btn:hover {
+    background-color: #1a1a1a;
+}
+
+.google-wallet-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.wallet-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.status-message {
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: var(--gold);
+    font-style: italic;
+}
+
+.instructions {
+    margin-top: 40px;
+    padding: 20px;
+}
+
+.instructions h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--gold);
+    margin-bottom: 15px;
+}
+
+.instructions ul {
+    list-style: none;
+}
+
+.instructions li {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    line-height: 1.4;
+    padding-left: 20px;
+    position: relative;
+}
+
+.instructions li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+}
+
+footer {
+    text-align: center;
+    margin-top: 60px;
+    padding-bottom: 20px;
+}
+
+footer p {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+}

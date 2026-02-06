@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aquilea 57 - Smaqs Wallet Demo</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <img src="logo.jpg" alt="Aquilea 57 Logo" class="logo">
+            <h1>Smaqs Economy</h1>
+            <p class="subtitle">La moneda interna de Aquilea 57</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Tu Billetera</h2>
+                </div>
+                <div class="balance-container">
+                    <span class="balance-label">SALDO DISPONIBLE</span>
+                    <span class="balance-value">1,250 Ɖ</span>
+                    <span class="balance-name">SMAQS</span>
+                </div>
+
+                <div class="actions">
+                    <p class="info-text">Agregá tus Smaqs a Google Wallet para usarlos en la barra de forma segura.</p>
+
+                    <button id="addToWalletBtn" class="google-wallet-btn">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Wallet_Icon_2022.svg"
+                            alt="Google Wallet" class="wallet-icon">
+                        Add to Google Wallet
+                    </button>
+
+                    <div id="statusMessage" class="status-message"></div>
+                </div>
+            </div>
+
+            <section class="instructions">
+                <h3>Cómo funciona</h3>
+                <ul>
+                    <li><strong>Identidad:</strong> Tu pase de Google Wallet contiene tu ID único de socio.</li>
+                    <li><strong>Seguridad:</strong> El saldo se valida en tiempo real en nuestro servidor central.</li>
+                    <li><strong>Uso:</strong> Presentá el código QR en la barra para pagar tus consumos.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Aquilea 57 - Privado y Confidencial</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('addToWalletBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('addToWalletBtn');
+            const status = document.getElementById('statusMessage');
+
+            btn.disabled = true;
+            btn.textContent = 'Generando pase...';
+
+            try {
+                const response = await fetch('/api/wallet/create-pass', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.saveUrl) {
+                    window.location.href = data.saveUrl;
+                } else {
+                    status.textContent = 'Demo: En una versión real, aquí se abriría el link de Google Wallet. (Credenciales requeridas)';
+                    btn.disabled = false;
+                    btn.innerHTML = `
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Wallet_Icon_2022.svg" alt="Google Wallet" class="wallet-icon">
+                        Add to Google Wallet
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                status.textContent = 'Error al conectar con el servidor de la demo.';
+                btn.disabled = false;
+                btn.innerHTML = `
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Wallet_Icon_2022.svg" alt="Google Wallet" class="wallet-icon">
+                        Add to Google Wallet
+                    `;
+            }
+        });
+    </script>
+</body>
+
+</html>

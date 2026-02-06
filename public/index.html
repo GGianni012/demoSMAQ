@@ -75,7 +75,17 @@
                 const data = await response.json();
 
                 if (data.saveUrl) {
-                    window.location.href = data.saveUrl;
+                    // MODO DEBUG: No redirigir automáticamente para poder ver el payload
+                    // window.location.href = data.saveUrl;
+
+                    console.log('DEBUG PAYLOAD:', data.debugPayload);
+                    status.innerHTML = `
+                        <p style="color: #4caf50;">¡Token generado!</p>
+                        <p>Copiá este JSON y pegalo en el validador de Google:</p>
+                        <textarea style="width: 100%; height: 200px; background: #222; color: #fff; font-family: monospace;">${JSON.stringify(data.debugPayload, null, 2)}</textarea>
+                        <br>
+                        <a href="${data.saveUrl}" target="_blank" style="color: #d4af37; text-decoration: underline;">Probar Link Generado Manualmente</a>
+                    `;
                 } else {
                     status.textContent = 'Demo: ' + (data.message || 'Error en la respuesta');
                     btn.disabled = false;

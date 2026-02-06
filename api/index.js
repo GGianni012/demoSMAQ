@@ -25,7 +25,7 @@ app.post('/api/wallet/create-pass', async (req, res) => {
 
     try {
         const envKey = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-        const issuerId = process.env.GOOGLE_ISSUER_ID;
+        const issuerId = process.env.GOOGLE_ISSUER_ID ? process.env.GOOGLE_ISSUER_ID.trim() : null;
 
         // Validaciones súper básicas
         if (!envKey) {
@@ -50,7 +50,8 @@ app.post('/api/wallet/create-pass', async (req, res) => {
             payload: {
                 genericObjects: [
                     {
-                        id: `${issuerId}.${mockUser.id}`,
+                        // ID DE OBJETO ÚNICO PARA CADA CLICK (Evita errores de caché en Google)
+                        id: `${issuerId}.obj_${Date.now()}`,
                         classId: `${issuerId}.Smaqs_Member`,
                         genericType: 'GENERIC_TYPE_UNSPECIFIED',
                         cardTitle: { defaultValue: { language: 'es', value: 'AQUILEA 57' } },

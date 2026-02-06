@@ -95,6 +95,12 @@ app.post('/api/wallet/create-pass', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Demo Smaqs Wallet corriendo en http://localhost:${PORT}`);
-});
+// Para desarrollo local
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Demo Smaqs Wallet corriendo en http://localhost:${PORT}`);
+    });
+}
+
+// Para Vercel
+module.exports = app;
